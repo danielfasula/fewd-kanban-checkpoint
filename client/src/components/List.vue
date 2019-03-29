@@ -1,10 +1,13 @@
 <template>
-  
+<div>
+  {{listData}}  
+</div>  
 </template>
 
 <script>
 export default {
-  name: 'List'
+  name: 'List',
+  props: ['listData']
 }
 </script>
 

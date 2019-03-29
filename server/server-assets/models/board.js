@@ -3,7 +3,7 @@ let Schema = mongoose.Schema
 let ObjectId = Schema.Types.ObjectId
 let schemaName = 'Board'
 
-let Lists = require('./list')
+let Lists = require('./List')
 
 
 let schema = new Schema({

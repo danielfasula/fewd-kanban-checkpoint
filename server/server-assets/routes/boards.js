@@ -1,5 +1,5 @@
 let router = require('express').Router()
-let Boards = require('../models/board')
+let Boards = require('../models/Board')
 
 //GET
 router.get('/', (req, res, next) => {

@@ -45,11 +45,22 @@ server.use((req, res, next) => {
   next()
 })
 
+//Additional MiddleWear that adds the authorId to the req.body
+server.use('*', (req, res, next) => {
+  if (req.method == "POST") {
+    req.body.authorId = req.session.uid
+  }
+  next()
+})
+
+
+
 //YOUR ROUTES HERE!!!!!!
-let boardRoutes = require('./server-assets/routes/board')
+let boardRoutes = require('./server-assets/routes/boards')
 server.use('/api/boards', boardRoutes)
 
-
+let listRoutes = require('./server-assets/routes/lists')
+server.use('/api/lists', listRoutes)
 
 
 
@@ -60,6 +71,12 @@ server.use('*', (req, res, next) => {
   res.status(404).send({
     error: 'No matching routes'
   })
+})
+
+//Error Handler
+server.use('*', (err, req, res, next) => {
+  console.error(err)
+  res.status(err.status || 400).send(err)
 })
 
 

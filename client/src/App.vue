@@ -1,5 +1,8 @@
 <template>
   <div id="app">
+    <div v-if="user._id" class="d-flex">
+      <button @click="logout">Logout</button>
+    </div>
     <router-view />
   </div>
 </template>
@@ -7,9 +10,15 @@
 <script>
   export default {
     name: 'App',
-    mounted() {
-      //Authenticate on startup
-      this.$store.dispatch('authenticate')
+    computed: {
+      user() {
+        return this.$store.state.user
+      }
+    },
+    methods: {
+      logout() {
+        this.$store.dispatch('logout')
+      }
     }
   }
 </script>

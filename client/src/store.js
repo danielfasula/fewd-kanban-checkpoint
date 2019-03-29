@@ -6,7 +6,7 @@ import router from './router'
 Vue.use(Vuex)
 
 //Allows axios to work locally or live
-let base = window.location.host.includes('localhost:8080') ? '//localhost:3000' : '/'
+let base = window.location.host.includes('localhost:8080') ? '//localhost:3000/' : '/'
 
 let auth = Axios.create({
   baseURL: base + "auth/",
@@ -24,7 +24,8 @@ export default new Vuex.Store({
   state: {
     user: {},
     boards: [],
-    activeBoard: {}
+    activeBoard: {},
+    lists: []
   },
   mutations: {
     setUser(state, user) {
@@ -32,6 +33,12 @@ export default new Vuex.Store({
     },
     setBoards(state, boards) {
       state.boards = boards
+    },
+    lists(state, lists) {
+      state.lists = lists
+    },
+    addList(state, list) {
+      state.lists.push(list)
     }
   },
   actions: {
@@ -60,6 +67,13 @@ export default new Vuex.Store({
           router.push({ name: 'boards' })
         })
     },
+    logout({commit}) {
+      auth.delete('logout')
+        .then(res => {
+          commit('setUser', {})
+          router.push({name: 'login'})
+        })
+    },
     //#endregion
 
 
@@ -81,12 +95,24 @@ export default new Vuex.Store({
         .then(res => {
           dispatch('getBoards')
         })
-    }
+    },
     //#endregion
 
 
     //#region -- LISTS --
-
+    getLists({commit}, boardId) {
+      api.get('lists/'+boardId)
+        .then(res => {
+          commit('lists', res.data)
+        })
+    },
+    addList({commit}, list) {
+      api.post('lists', list)
+        .then(res => {
+          commit('addList', res.data)
+        })
+        .catch(e => console.error(e))
+    }
 
 
     //#endregion
