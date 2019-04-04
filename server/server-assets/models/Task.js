@@ -1,28 +1,22 @@
 let mongoose = require('mongoose')
 let Schema = mongoose.Schema
 let ObjectId = Schema.Types.ObjectId
-let schemaName = 'List'
+let schemaName = 'Task'
 
-let Task = require('./Task')
-
+let comment = new Schema({
+  content: { type: String, required: true }
+}, { timestamps: true })
 
 let schema = new Schema({
   title: { type: String, required: true },
   authorId: { type: ObjectId, ref: 'User', required: true },
-  boardId: { type: ObjectId, ref: 'Board', required: true }
+  boardId: { type: ObjectId, ref: 'Board', required: true },
+  listId: { type: ObjectId, ref: 'List', required: true },
+  comments: [comment]
 }, { timestamps: true })
 
 //CASCADE ON DELETE
-schema.pre('remove', function (next) {
-  Task.deleteMany({ listId: this._id }, err => {
-    if (err) {
-      console.error(err)
-      return
-    }
-    console.log('Tasks deleted')
-    next()
-  })
-})
+
 
 
 

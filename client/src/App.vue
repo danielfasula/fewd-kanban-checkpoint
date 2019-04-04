@@ -1,6 +1,7 @@
 <template>
   <div id="app">
-    <div v-if="user._id" class="d-flex">
+    <div v-if="user._id" class="px-3 mb-3 d-flex justify-content-between align-items-center my-shadow">
+      <img @click="$router.push({name: 'boards'})" class="action" height="75px" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ68b42995TanMsiWawbhaW6H5QfAeJW6ySBKtQ8KG4fYzXZ_2n" alt="logo">
       <button @click="logout">Logout</button>
     </div>
     <router-view />
@@ -43,5 +44,13 @@
 
   #nav a.router-link-exact-active {
     color: #42b983;
+  }
+
+  .action {
+    cursor: pointer;
+  }
+
+  .my-shadow {
+    box-shadow: 0 5px 5px black;
   }
 </style>

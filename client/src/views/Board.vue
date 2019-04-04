@@ -1,11 +1,14 @@
 <template>
-  <div class="board">
-    {{board.title}}
+  <div class="board container-fluid">
+    <h4>{{board.title}}</h4>
+    <h5>{{board.description}}</h5>
+    <div class="row flex-nowrap lists-container">
     <list v-for="list in lists" :listData='list'></list>
-    <form @submit.prevent="addList">
+    <form class="col-6 col-md-3" @submit.prevent="addList">
       <input v-model="newList.title" type="text" required placeholder="List Title">
       <button type="submit">Submit</button>
     </form>
+    </div>
   </div>
 </template>
 
@@ -16,6 +19,7 @@
     props: ["boardId"],
     mounted() {
       this.$store.dispatch('getLists', this.boardId)
+      this.$store.dispatch('getTasks', this.boardId)
     },
     data() {
       return {
@@ -46,3 +50,10 @@
     }
   };
 </script>
+
+<style scoped>
+
+.lists-container {
+  overflow-x: scroll;
+}
+</style>

@@ -18,8 +18,10 @@ router.post('/', (req, res, next) => {
 })
 
 router.delete('/:id', (req, res, next) => {
-    List.findByIdAndRemove(req.params.id)
-        .then(list => {
+    List.remove({ _id: req.params.id }, err => {
+        if (err) {
+            return res.send(err)
+        }
             res.send({message: "List Deleted!"})
         })
         .catch(next)

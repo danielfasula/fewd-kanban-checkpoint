@@ -3,7 +3,8 @@ let Schema = mongoose.Schema
 let ObjectId = Schema.Types.ObjectId
 let schemaName = 'Board'
 
-let Lists = require('./List')
+let List = require('./List')
+let Task = require('./Task')
 
 
 let schema = new Schema({
@@ -14,14 +15,16 @@ let schema = new Schema({
 
 //CASCADE ON DELETE
 
-schema.pre('remove', function (next) {
-  //lets find all the lists and remove them
-  this._id //THIS IS THE BOARD
+schema.pre('findOneAndRemove', function (next) {
+  //@ts-ignore
+  let params = { boardId: this._conditions._id }
   Promise.all([
-    //Tasks.deleteMany({ boardId: this._id }),
-    Lists.deleteMany({ boardId: this._id })
+    List.deleteMany(params), Task.deleteMany(params)
   ])
-    .then(() => next())
+    .then(() => {
+      console.log('lists and tasks deleted!')
+      next()
+    })
     .catch(err => next(err))
 })
 

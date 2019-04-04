@@ -9,7 +9,7 @@ var port = process.env.PORT || 3000
 server.use(express.static(__dirname + '/../client/dist'))
 
 
-var whitelist = ['http://localhost:8080'];
+var whitelist = ['http://localhost:8080', 'https://fewd-kanban1.herokuapp.com/'];
 var corsOptions = {
   origin: function (origin, callback) {
     var originIsWhitelisted = whitelist.indexOf(origin) !== -1;
@@ -61,6 +61,9 @@ server.use('/api/boards', boardRoutes)
 
 let listRoutes = require('./server-assets/routes/lists')
 server.use('/api/lists', listRoutes)
+
+let taskRoutes = require('./server-assets/routes/tasks')
+server.use('/api/tasks', taskRoutes)
 
 
 

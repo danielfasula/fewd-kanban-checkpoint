@@ -25,7 +25,8 @@ export default new Vuex.Store({
     user: {},
     boards: [],
     activeBoard: {},
-    lists: []
+    lists: [],
+    tasks: {},
   },
   mutations: {
     setUser(state, user) {
@@ -39,10 +40,52 @@ export default new Vuex.Store({
     },
     addList(state, list) {
       state.lists.push(list)
-    }
+    },
+    removeList(state, listId) {
+      for (let i = 0; i < state.lists.length; i++) {
+        let list = state.lists[i]
+        if (list._id == listId) {
+          state.lists.splice(i, 1)
+          break
+        }
+      }
+    },
+    tasks(state, taskArr) {
+      let obj = {}
+      taskArr.forEach(task => {
+        if (!obj[task.listId]) {
+          obj[task.listId] = []
+        }
+        obj[task.listId].push(task)
+      })
+      state.tasks = obj
+    },
+    addTask(state, task) {
+      let taskArr = state.tasks[task.listId] || []
+      Vue.set(state.tasks, task.listId, [...taskArr, task])
+    },
+    removeTask(state, payload) {
+      let taskArr = state.tasks[payload.oldListId]
+      taskArr.forEach((task, i, arr) => {
+        if (task._id == payload.taskId) {
+          arr.splice(i, 1)
+        }
+      })
+      Vue.set(state.tasks, payload.oldListId, taskArr)
+    },
+    replaceTask(state, task) {
+      let taskArr = state.tasks[task.listId]
+      let index = taskArr.findIndex(t => t._id == task._id)
+      if (index != 1) {
+        taskArr[index] = task
+      }
+      Vue.set(state.tasks, task.listId, [...taskArr])
+    },
+
   },
   actions: {
-    //#region -- AUTH STUFF --
+
+    // #region -- AUTH STUFF --
     register({ commit, dispatch }, newUser) {
       auth.post('register', newUser)
         .then(res => {
@@ -77,7 +120,7 @@ export default new Vuex.Store({
     //#endregion
 
 
-    //#region -- BOARDS --
+    // #region -- BOARDS --
     getBoards({ commit, dispatch }) {
       api.get('boards')
         .then(res => {
@@ -99,7 +142,7 @@ export default new Vuex.Store({
     //#endregion
 
 
-    //#region -- LISTS --
+    // #region -- LISTS --
     getLists({commit}, boardId) {
       api.get('lists/'+boardId)
         .then(res => {
@@ -112,9 +155,71 @@ export default new Vuex.Store({
           commit('addList', res.data)
         })
         .catch(e => console.error(e))
-    }
+    },
+    deleteList({ commit }, list) {
+      api.delete('lists/' + list._id)
+        .then(res => {
+          console.log(res.data.message)
+          commit('removeList', list._id)
+      })
+        .catch(e => console.error(e))
+    },
 
 
     //#endregion
+
+
+    // #region -- TASKS --
+
+    getTasks({commit}, boardId) {
+      api.get('tasks/' + boardId)
+        .then(res => {
+        commit('tasks', res.data)
+      })
+    },
+
+    addTask({ commit }, task) {
+      api.post('tasks', task)
+        .then(res => {
+          console.log(res)
+          commit('addTask', res.data)
+        })
+      .catch(e => console.error(e))
+    },
+
+    moveTask({ commit }, payload) {
+      api.put('tasks/' + payload.taskId, payload)
+        .then(res => {
+          commit('addTask', res.data)
+          commit('removeTask', payload)
+        })
+      .catch(e => console.error(e))
+    },
+    
+    deleteTask({commit}, { _id: taskId, listId: oldListId}) {
+      api.delete('tasks/' + taskId) 
+        .then(res => {
+          console.log(res)
+          commit('removeTask', {taskId, oldListId})
+        })
+        .catch(e => console.error(e))
+      
+    },
+
+    //#endregion
+
+
+    // #region -- COMMENTS --
+    addComment({ commit }, payload) {
+      api.put('tasks/' + payload.taskId + '/add-comment', payload.comment)
+        .then(res => {
+          console.log(res)
+          commit('replaceTask', res.data)
+        })
+      .catch(e => console.error(e))
+    },
+
+    // #endregion
+
   }
 })
